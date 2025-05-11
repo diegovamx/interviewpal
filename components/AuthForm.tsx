@@ -6,24 +6,25 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
-import {Form} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
+import FormField from "./FormField";
+import { useRouter } from "next/navigation";
 
-
-const authFormSchema = (type: FormType) => { 
+const authFormSchema = (type: FormType) => {
   return z.object({
-    name: type === "sign-up" ? z.string().min(3).max(50) : z.string().optional(),
+    name:
+      type === "sign-up" ? z.string().min(3).max(50) : z.string().optional(),
     email: z.string().email(),
     password: z.string().min(3).max(50),
-  })
-}
+  });
+};
 
 const AuthForm = ({ type }: { type: FormType }) => {
+  const router = useRouter();
   const formSchema = authFormSchema(type);
- 
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,21 +34,20 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   });
 
-
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-   try {
-    if (type === "sign-up") {
-      console.log("Sign up values: ", values);
-      toast.success("Sign up successful!");
-    } else{
-      console.log("Sign in values: ", values);
-      toast.success("Sign in successful!");
-    }
-   } catch (error) {
+    try {
+      if (type === "sign-up") {
+        toast.success("Account created successfully. Please sign in.");
+        router.push("/sign-in");
+      } else {
+        toast.success("Signed in  successfully.");
+        router.push("/");
+      }
+    } catch (error) {
       console.log("Error: ", error);
       toast.error(`Something went wrong: ${error}`);
-   }
+    }
     console.log(values);
   }
 
@@ -58,7 +58,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       <div className="flex flex-col gap-6 card py-14 px-10">
         <div className="flex flex-row gap-2 justify-center">
           <Image src="/logo.svg" alt="logo" width={38} height={32} />
-          <h2 className="text-primary-100">PrepWise</h2>
+          <h2 className="text-primary-100">PrepAI</h2>
         </div>
         <h3>Practice Job Interviews with AI.</h3>
 
@@ -67,9 +67,28 @@ const AuthForm = ({ type }: { type: FormType }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full space-y-6 mt-4 form"
           >
-            {!isSignIn && <p>Name</p>}
-            <p>Email</p>
-            <p>password</p>
+            {!isSignIn && (
+              <FormField
+                control={form.control}
+                name="name"
+                label="Name"
+                placeholder="Your Name"
+              />
+            )}
+            <FormField
+              control={form.control}
+              name="email"
+              label="Email"
+              placeholder="Your Email"
+              type="email"
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              label="Password"
+              placeholder="Your Password"
+              type="password"
+            />
 
             <Button className="btn" type="submit">
               {isSignIn ? "Sign In" : "Create an Account"}
