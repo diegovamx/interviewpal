@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getRandomInterviewCover, getTechLogos } from "@/lib/utils";
+import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
 
 const InterviewCard = ({
