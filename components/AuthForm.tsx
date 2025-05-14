@@ -6,14 +6,16 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { sign } from "crypto";
+import { signUp, signIn } from "@/lib/actions/auth.action";
+
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -49,15 +51,28 @@ const AuthForm = ({ type }: { type: FormType }) => {
           name: name!,
           email: email,
           password: password,
-        });
+        })
         if (!result?.success) {
-          toast.error(result.message);
+          toast.error(result?.message);
           return;
         }
 
         toast.success("Account created successfully. Please sign in.");
         router.push("/sign-in");
       } else {
+        const { email, password } = values;
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+        const idToken = await userCredential.user.getIdToken()
+
+        if (!idToken) {
+          toast.error("Error signing in. Please try again.");
+          return;
+        }
+        await signIn({
+          email, idToken
+        })
+
         toast.success("Signed in  successfully.");
         router.push("/");
       }
