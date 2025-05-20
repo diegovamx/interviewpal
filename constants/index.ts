@@ -97,6 +97,204 @@ export const mappings = {
   "aws amplify": "amplify",
 };
 
+export const generator = {
+  "name": "InterviewPalWorkflow",
+  "nodes": [
+    {
+      "name": "start",
+      "type": "conversation",
+      "isStart": true,
+      "metadata": {
+        "position": {
+          "x": 606.8333384000339,
+          "y": -551.9296765765318
+        }
+      },
+      "prompt": "Greet the user and help them create a new AI Interviewer.",
+      "voice": {
+        "model": "aura-2",
+        "voiceId": "thalia",
+        "provider": "deepgram"
+      },
+      "variableExtractionPlan": {
+        "output": [
+          {
+            "title": "level",
+            "description": "The job experience level.",
+            "type": "string",
+            "enum": [
+              "entry",
+              "mid",
+              "senior"
+            ]
+          },
+          {
+            "title": "amount",
+            "description": "How many questions would you like to generate?",
+            "type": "number",
+            "enum": []
+          },
+          {
+            "title": "techstack",
+            "description": "A list of technologies to cover during the job interview. For example, React, Next.js, Express.js, Node and so on…",
+            "type": "string",
+            "enum": []
+          },
+          {
+            "title": "role",
+            "description": "What role should would you like to train for? For example Frontend, Backend, Fullstack, Design, UX? ",
+            "type": "string",
+            "enum": []
+          },
+          {
+            "title": "type",
+            "description": "What type of the interview should it be? ",
+            "type": "string",
+            "enum": [
+              "technical",
+              "behavioral",
+              "mixed"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "apiRequest_1747552711384",
+      "type": "apiRequest",
+      "metadata": {
+        "position": {
+          "x": 606.699024396065,
+          "y": -18.62628825261043
+        }
+      },
+      "method": "POST",
+      "url": `${process.env.NEXT_PUBLIC_BASE_URL}/api/vapi/generate`,
+      "headers": {
+        "type": "object",
+        "properties": {}
+      },
+      "body": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "",
+            "value": "{{ role }}"
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "value": "{{ type }}"
+          },
+          "level": {
+            "type": "string",
+            "description": "",
+            "value": " {{ level }}"
+          },
+          "userid": {
+            "type": "string",
+            "description": "",
+            "value": "{{ userid }}"
+          },
+          "techstack": {
+            "type": "string",
+            "description": "",
+            "value": "{{ techstack }}"
+          },
+          "amount": {
+            "type": "string",
+            "description": "",
+            "value": "{{ amount }}"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "properties": {}
+      },
+      "mode": "blocking",
+      "hooks": []
+    },
+    {
+      "name": "conversation_1747760857127",
+      "type": "conversation",
+      "metadata": {
+        "position": {
+          "x": 604.2636575161164,
+          "y": 280.17110751481454
+        }
+      },
+      "prompt": "Thank the user for the conversation and inform them that the interview has been generated successfully.",
+      "voice": {
+        "provider": "deepgram",
+        "voiceId": "thalia",
+        "model": "aura-2"
+      }
+    },
+    {
+      "name": "hangup_1747760970546",
+      "type": "hangup",
+      "metadata": {
+        "position": {
+          "x": 686.9149932861328,
+          "y": 821.0306091308594
+        }
+      }
+    },
+    {
+      "name": "conversation_1747762813694",
+      "type": "conversation",
+      "metadata": {
+        "position": {
+          "x": 606.8333384000339,
+          "y": -301.92967657653185
+        }
+      },
+      "prompt": "Say that the Interview will be generated shortly.",
+      "voice": {
+        "provider": "deepgram",
+        "voiceId": "thalia",
+        "model": "aura-2"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "apiRequest_1747552711384",
+      "to": "conversation_1747760857127",
+      "condition": {
+        "type": "ai",
+        "prompt": ""
+      }
+    },
+    {
+      "from": "conversation_1747760857127",
+      "to": "hangup_1747760970546",
+      "condition": {
+        "type": "ai",
+        "prompt": ""
+      }
+    },
+    {
+      "from": "start",
+      "to": "conversation_1747762813694",
+      "condition": {
+        "type": "ai",
+        "prompt": "If user provided all the required variables."
+      }
+    },
+    {
+      "from": "conversation_1747762813694",
+      "to": "apiRequest_1747552711384",
+      "condition": {
+        "type": "ai",
+        "prompt": ""
+      }
+    }
+  ]
+}
+
 // export const interviewer: CreateAssistantDTO = {
 //   name: "Interviewer",
 //   firstMessage:
